@@ -3,11 +3,12 @@
 
 let $ = require('jquery');
 
-module.exports.getNasaData = () => {
+module.exports.getNasaData = (startDate, endDate) => {
     return new Promise( (resolve, reject) => {
         $.ajax({
-            // url: "https://api.nasa.gov/neo/rest/v1/feed?start_date=2015-09-07&end_date=2015-09-08&api_key=anZnLkoPGrbCv21AqYmMkIEQyeGceLo0eJ6QcrbP"
             url: "../JSON/nasa.json"
+            // url: `https://api.nasa.gov/neo/rest/v1/feed?start_date=${startDate}&end_date=${endDate}&api_key=anZnLkoPGrbCv21AqYmMkIEQyeGceLo0eJ6QcrbP`
+            // url: "https://api.nasa.gov/neo/rest/v1/feed?start_date=`2015-09-07`&end_date=2015-09-08&api_key=anZnLkoPGrbCv21AqYmMkIEQyeGceLo0eJ6QcrbP"
         })
         .done( (data) => {
             resolve(data.near_earth_objects);
@@ -19,44 +20,40 @@ module.exports.getNasaData = () => {
     });
 };
 
-module.exports.getRudeData = () => {
-    return new Promise( (resolve, reject) => {
-        $.ajax({
-            url: " http://foaas.com/fucks"
-        })
-        .done( (data) => {
-            // console.log(data);
-            resolve(data);
-        })
-        .fail(error => {
-            reject(error); 
-            console.log("no data");
+module.exports.getRudeData = (asteroidName) => {
+    console.log(asteroidName);
+        return new Promise( (resolve, reject) => {
+            $.ajax({
+                url: `http://foaas.com/off/${asteroidName}/Everyone`
+            })
+            .done( (data) => {
+                console.log(data);
+                resolve(data);
+            })
+            .fail(error => {
+                reject(error); 
+                console.log("no data");
+            });
         });
-    });
 };
 },{"jquery":4}],2:[function(require,module,exports){
 "use strict";
 
 module.exports.formatData = (data) => {
     console.log('raw', data);
-    // let currentDate = Object.keys(data);
-    // // console.log('raw data - current date?', currentDate);
-    // for (let i = 0; i<currentDate.length; i++) {
-    //     console.log(currentDate[i]);
-    // }
-    for (let stats in data) {
-        // console.log('wat is data', data);
-        let currentDate = stats;
-        // console.log(currentDate, "ourside loop");
-        let allData = data[stats];
-        for (let i=0; i<allData.length; i++) {
-            console.log('wat is stats', currentDate);
-            let asteroidName = allData[i].name;
-            let hazard = allData[i].is_potentially_hazardous_asteroid;
-            // let currentDate = allData;
-            // currentDateAsteroids.push(allData[i].name);
+    for (let date in data) {
+        let impactDate = date;
+        let asteroidsOnDay = data[date];
+        let asteroidList = [];
+        for (let i=0; i<3; i++) {
+            // console.log("should be object of indiv asteroids", asteroidsOnDay[i]);
+            let asteroidName = asteroidsOnDay[i].name;
+            console.log(asteroidName);
+            asteroidList.push(asteroidName);
         }
-        } 
+        console.log(asteroidList);
+        return asteroidList;
+    }
 };
 },{}],3:[function(require,module,exports){
 "use strict";
@@ -65,11 +62,20 @@ let dataFactory = require("./dataFactory");
 let $ = require('jquery');
 let formatData = require('./formatData');
 
-dataFactory.getNasaData()
-.then( (data) => {
-    formatData.formatData(data);
-    let rudePhrases = dataFactory.getRudeData();
-});
+
+// $("#submitDates").click( () => {
+    console.log($("#startDate").val(), $("#endDate").val());
+    let startDate = $("#startDate").val();
+    let endDate = $("#endDate").val();
+    dataFactory.getNasaData(startDate, endDate)
+    .then( (data) => {
+        let asteroidNames = formatData.formatData(data);
+        for (let i=0; i<asteroidNames.length; i++){
+            let rudePhrases = dataFactory.getRudeData(asteroidNames[i]);
+            console.log("when");
+        }
+    });
+// });
 
 },{"./dataFactory":1,"./formatData":2,"jquery":4}],4:[function(require,module,exports){
 /*!
