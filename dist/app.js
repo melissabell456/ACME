@@ -6,9 +6,7 @@ let $ = require('jquery');
 module.exports.getNasaData = (startDate, endDate) => {
     return new Promise( (resolve, reject) => {
         $.ajax({
-            url: "../JSON/nasa.json"
-            // url: `https://api.nasa.gov/neo/rest/v1/feed?start_date=${startDate}&end_date=${endDate}&api_key=anZnLkoPGrbCv21AqYmMkIEQyeGceLo0eJ6QcrbP`
-            // url: "https://api.nasa.gov/neo/rest/v1/feed?start_date=`2015-09-07`&end_date=2015-09-08&api_key=anZnLkoPGrbCv21AqYmMkIEQyeGceLo0eJ6QcrbP"
+            url: `https://api.nasa.gov/neo/rest/v1/feed?start_date=${startDate}&end_date=${endDate}&api_key=anZnLkoPGrbCv21AqYmMkIEQyeGceLo0eJ6QcrbP`
         })
         .done( (data) => {
             resolve(data.near_earth_objects);
@@ -24,10 +22,11 @@ module.exports.getRudeData = (asteroidName) => {
     console.log(asteroidName);
         return new Promise( (resolve, reject) => {
             $.ajax({
-                url: `http://foaas.com/off/${asteroidName}/Everyone`
+                url: `http://foaas.com/yoda/${asteroidName}/Everyone`,
+                'Accept': 'application/json'
             })
             .done( (data) => {
-                console.log(data);
+                $("#response").append(data);
                 resolve(data);
             })
             .fail(error => {
@@ -63,8 +62,8 @@ let $ = require('jquery');
 let formatData = require('./formatData');
 
 
-// $("#submitDates").click( () => {
-    console.log($("#startDate").val(), $("#endDate").val());
+$("#submitDates").click( () => {
+    $("#response").empty();
     let startDate = $("#startDate").val();
     let endDate = $("#endDate").val();
     dataFactory.getNasaData(startDate, endDate)
@@ -72,10 +71,9 @@ let formatData = require('./formatData');
         let asteroidNames = formatData.formatData(data);
         for (let i=0; i<asteroidNames.length; i++){
             let rudePhrases = dataFactory.getRudeData(asteroidNames[i]);
-            console.log("when");
         }
     });
-// });
+});
 
 },{"./dataFactory":1,"./formatData":2,"jquery":4}],4:[function(require,module,exports){
 /*!

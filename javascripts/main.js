@@ -5,8 +5,8 @@ let $ = require('jquery');
 let formatData = require('./formatData');
 
 
-// $("#submitDates").click( () => {
-    console.log($("#startDate").val(), $("#endDate").val());
+$("#submitDates").click( () => {
+    $("#response").empty();
     let startDate = $("#startDate").val();
     let endDate = $("#endDate").val();
     dataFactory.getNasaData(startDate, endDate)
@@ -14,7 +14,6 @@ let formatData = require('./formatData');
         let asteroidNames = formatData.formatData(data);
         for (let i=0; i<asteroidNames.length; i++){
             let rudePhrases = dataFactory.getRudeData(asteroidNames[i]);
-            console.log("when");
         }
     });
-// });
+});
